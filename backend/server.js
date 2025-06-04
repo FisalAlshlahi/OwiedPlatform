@@ -4,23 +4,31 @@ const supervisorRoutes = require('./routes/supervisorRoutes');
 const app = express();
 const PORT = 3000;
 
-app.use(cors()); // حل مشكلة CORS
-app.use(express.json()); // Middleware to parse JSON
+// تكوين CORS للسماح بالوصول من أي مصدر (للتطوير فقط)
+app.use(cors({
+  origin: '*', // السماح لجميع المصادر بالوصول
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+// Middleware لتحليل طلبات JSON
+app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
-const studentRoutes = require('./routes/studentRoutes'); // ✅ استيراد مسارات الطالب
+const studentRoutes = require('./routes/studentRoutes');
 
-app.use('/api/auth', authRoutes);     // ✅ مسارات تسجيل الدخول
-app.use('/api', studentRoutes);       // ✅ مسارات الطالب (لوحة الطالب)
+app.use('/api/auth', authRoutes);
+app.use('/api', studentRoutes);
 app.use('/api', supervisorRoutes);
 
-// Test route
+// مسار اختبار
 app.get('/', (req, res) => {
     res.send('Welcome to the EPA Project Backend!');
 });
 
-// Start the server
-app.listen(PORT, () => {
+// بدء تشغيل الخادم على جميع الواجهات
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`For external access use: http://<your-ip-address>:${PORT}`);
 });
