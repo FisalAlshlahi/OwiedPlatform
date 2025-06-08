@@ -1,22 +1,26 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'owied_platform_secret_key';
 
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-
-    const token = authHeader && authHeader.split(' ')[1]; // Remove "Bearer"
-
-    if (!token) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'مطلوب توثيق' });
+  }
+  
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      console.error('Token verification error:', err);
+      return res.status(403).json({ message: 'توكن غير صالح أو منتهي الصلاحية' });
     }
-
-    jwt.verify(token, process.env.JWT_SECRET || 'default_secret_key', (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid token.' });
-        }
-
-        req.user = user; // now you can access req.user.id, req.user.role, etc.
-        next();
-    });
+    
+    req.user = {
+      id: decoded.id,
+      role: decoded.role
+    };
+    next();
+  });
 };
 
 module.exports = authenticateToken;

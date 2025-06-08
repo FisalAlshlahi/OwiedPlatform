@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+// استخدام متغير بيئي أو تكوين مركزي لعنوان API
 // يمكن تغيير هذا العنوان حسب بيئة التشغيل
-// استخدم المسار النسبي إذا كنت قد أضفت إعداد proxy في package.json
-const API_BASE_URL = '';  // مسار نسبي عند استخدام proxy
+const API_BASE_URL = 'http://localhost:5000';
 
 const Login = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
@@ -17,31 +17,34 @@ const Login = ({ onLoginSuccess }) => {
         setLoading(true);
 
         try {
-            console.log('محاولة تسجيل الدخول مع:', { email, password });
-            
-            // استخدام المسار النسبي مع proxy
+            // استخدام المتغير المركزي لعنوان API
             const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
                 email,
                 password
             });
 
-            console.log('استجابة تسجيل الدخول:', response.data);
-            
             localStorage.setItem('token', response.data.token);
+            
+            // إضافة معلومات المستخدم للتخزين المحلي للاستخدام لاحقاً
             localStorage.setItem('user', JSON.stringify(response.data.user));
             
+            // تأخير قصير قبل إعادة التوجيه
             setTimeout(() => {
                 onLoginSuccess(response.data.user.role);
             }, 500);
             
         } catch (error) {
-            console.error('خطأ تسجيل الدخول:', error);
+            console.error('Login error:', error);
             
+            // عرض رسالة خطأ أكثر تفصيلاً
             if (error.response) {
+                // الخادم استجاب برمز حالة خارج نطاق 2xx
                 setError(error.response.data.message || 'فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.');
             } else if (error.request) {
+                // لم يتم استلام استجابة من الخادم
                 setError('لا يمكن الوصول إلى الخادم. يرجى التحقق من اتصالك بالإنترنت أو المحاولة لاحقاً.');
             } else {
+                // حدث خطأ أثناء إعداد الطلب
                 setError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
             }
         } finally {

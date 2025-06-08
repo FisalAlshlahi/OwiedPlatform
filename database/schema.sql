@@ -27,13 +27,6 @@ CREATE TABLE CoreEPAs (
     description TEXT
 );
 
--- جدول الأنشطة
-CREATE TABLE Activities (
-    id SERIAL PRIMARY KEY,
-    core_epa_id INTEGER REFERENCES CoreEPAs(id),
-    name VARCHAR(255) NOT NULL,
-    description TEXT
-);
 
 -- جدول السلوكيات
 CREATE TABLE Behaviors (
@@ -42,14 +35,6 @@ CREATE TABLE Behaviors (
     description TEXT NOT NULL
 );
 
--- جدول التقييمات
-CREATE TABLE Evaluations (
-    id SERIAL PRIMARY KEY,
-    student_id INTEGER REFERENCES Students(id),
-    behavior_id INTEGER REFERENCES Behaviors(id),
-    is_met BOOLEAN NOT NULL,
-    evaluation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 
 -- جدول Smaller EPAs
@@ -62,10 +47,10 @@ CREATE TABLE SmallerEPAs (
 
 
 
--- جدول Smaller EPAs
-CREATE TABLE SmallerEPAs (
+-- جدول Activities
+CREATE TABLE Activities (
     id SERIAL PRIMARY KEY,
-    core_epa_id INTEGER REFERENCES CoreEPAs(id),
+    smaller_epa_id INTEGER REFERENCES SmallerEPAs(id),
     name VARCHAR(255) NOT NULL,
     description TEXT
 );

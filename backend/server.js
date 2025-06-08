@@ -2,11 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const supervisorRoutes = require('./routes/supervisorRoutes');
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
-// تكوين CORS للسماح بالوصول من أي مصدر (للتطوير فقط)
+// زيادة حجم الرؤوس المسموح به
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// تكوين CORS للسماح بالوصول من أي مصدر
 app.use(cors({
-  origin: '*', // السماح لجميع المصادر بالوصول
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -27,8 +31,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to the EPA Project Backend!');
 });
 
-// بدء تشغيل الخادم على جميع الواجهات
+// بدء تشغيل الخادم
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`For external access use: http://<your-ip-address>:${PORT}`);
 });
