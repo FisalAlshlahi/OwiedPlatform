@@ -1,16 +1,61 @@
 const express = require('express');
-const supervisorController = require('../controllers/supervisorController');
-const authenticateToken = require('../middleware/authMiddleware'); // Assuming you have auth middleware
+const cors = require('cors');
 
-const router = express.Router();
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Get list of students
-router.get('/supervisor/students', authenticateToken, supervisorController.getStudents);
+// إعدادات أساسية فقط
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Get evaluations for a student
-router.get('/supervisor/evaluations/:studentId', authenticateToken, supervisorController.getEvaluations);
+// CORS بسيط
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 
-// Submit evaluation
-router.post('/supervisor/evaluate', authenticateToken, supervisorController.submitEvaluation);
+// مسار اختبار بسيط
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Server is working!',
+        timestamp: new Date().toISOString(),
+        status: 'OK'
+    });
+});
 
-module.exports = router;
+// مسار اختبار الـ headers
+app.get('/test', (req, res) => {
+    res.json({
+        message: 'Test endpoint working',
+        headers: req.headers,
+        method: req.method,
+        url: req.url
+    });
+});
+
+// معالج 404
+app.use('*', (req, res) => {
+    res.status(404).json({
+        error: 'Not Found',
+        path: req.originalUrl
+    });
+});
+
+// معالج الأخطاء
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        error: 'Server Error',
+        message: err.message
+    });
+});
+
+// تشغيل الخادم
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Simple server running on http://localhost:${PORT}`);
+    console.log(`📝 Test it: curl http://localhost:${PORT}/`);
+});
+
+module.exports = app;
+
